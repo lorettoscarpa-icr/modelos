@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Central de Modelos — Loretto Scarpa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#4a5c2a;--verde-esc:#3a4a20;--verde-card:#43521f;
+    --dourado:#c9a950;--dourado-cl:#e3c878;
+    --creme:#f3efe2;--creme-dim:#c9c6b4;--linha:rgba(201,169,80,.22);
+    --credito:#9fcf7a;--debito:#e0a23a;--vermelho:#d98c7a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--verde);color:var(--creme);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:0 0 92px}
+  ::selection{background:var(--dourado);color:var(--verde)}
+
+  header{padding:22px 18px 16px;border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--verde) 78%,rgba(74,92,42,.92));backdrop-filter:blur(6px)}
+  .marca{font-family:'Playfair Display',serif;font-style:italic;font-weight:500;font-size:15px;letter-spacing:.5px;color:var(--dourado-cl);opacity:.85}
+  h1{font-family:'Playfair Display',serif;font-weight:700;font-size:26px;line-height:1.05;margin-top:2px}
+  h1 .lion{color:var(--dourado)}
+  .sub{font-size:13px;color:var(--creme-dim);margin-top:4px;font-weight:500}
+  .modotag{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(201,169,80,.16);color:var(--dourado-cl);border:1px solid var(--linha)}
+
+  .aviso{margin:12px 14px 0;padding:11px 13px;background:rgba(224,162,58,.12);border:1px solid rgba(224,162,58,.45);border-radius:11px;font-size:12.5px;color:var(--dourado-cl);line-height:1.45}
+
+  .resumo{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 14px 4px}
+  .kpi{background:var(--verde-esc);border:1px solid var(--linha);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+  .kpi.full{grid-column:1 / -1}
+  .kpi .lab{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--creme-dim);font-weight:600}
+  .kpi .val{font-family:'DM Mono',monospace;font-size:24px;color:var(--dourado-cl);margin-top:5px;font-weight:500}
+  .kpi .val small{font-size:13px;color:var(--creme-dim)}
+
+  .baradmin{padding:8px 14px 0}
+  .wrap{padding:12px 14px}
+
+  .modelo{background:var(--verde-card);border:1px solid var(--linha);border-radius:16px;margin-bottom:14px;border-left:3px solid var(--dourado);overflow:hidden}
+  .mhead{padding:15px 15px 4px;cursor:pointer}
+  .mhead h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mhead .acts{display:flex;align-items:center;gap:12px}
+  .edit{font-size:15px;color:var(--dourado-cl);opacity:.75;cursor:pointer}
+  .chev{font-size:13px;color:var(--creme-dim);transition:transform .2s}
+  .modelo.open .chev{transform:rotate(180deg)}
+
+  .saldos{display:flex;gap:10px;margin:10px 0 4px;padding:0 15px}
+  .saldo{flex:1;background:var(--verde-esc);border-radius:11px;padding:11px 12px}
+  .saldo .t{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--creme-dim);font-weight:600}
+  .saldo .n{font-family:'DM Mono',monospace;font-size:22px;color:var(--dourado-cl);margin-top:3px;line-height:1.05}
+  .saldo .n.zero{color:var(--creme-dim);opacity:.55}
+  .saldo .leg{font-size:10.5px;color:var(--creme-dim);margin-top:3px}
+
+  .corpo{padding:6px 15px 14px;display:none}
+  .modelo.open .corpo{display:block}
+  .secaoT{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--creme-dim);font-weight:700;margin:14px 0 8px}
+
+  .mes{border:1px solid var(--linha);border-radius:12px;margin-bottom:10px;overflow:hidden}
+  .mesH{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--verde-esc)}
+  .mesH .mt{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;text-transform:capitalize}
+  .badge{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;cursor:default}
+  .badge.pago{background:rgba(159,207,122,.16);color:var(--credito);border:1px solid rgba(159,207,122,.45)}
+  .badge.apagar{background:rgba(224,162,58,.16);color:var(--debito);border:1px solid rgba(224,162,58,.45)}
+  .badge.clic{cursor:pointer}
+  .mesB{padding:6px 12px 10px}
+  .lin{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(201,169,80,.08);font-size:13.5px}
+  .lin:last-child{border-bottom:none}
+  .lin .ic{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+  .lin.prod .ic{background:rgba(159,207,122,.16)}
+  .lin.ret .ic{background:rgba(224,162,58,.16)}
+  .lin .d{flex:1;min-width:0}
+  .lin .dt{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lin .sm{font-size:11px;color:var(--creme-dim)}
+  .lin .amt{font-family:'DM Mono',monospace;font-size:12px;text-align:right;white-space:nowrap}
+  .lin .amt .sp{color:var(--credito)}.lin .amt .sp.neg{color:var(--debito)}
+  .lin .amt .mn{color:var(--dourado-cl)}
+  .lin .x{color:var(--vermelho);opacity:.55;cursor:pointer;font-size:15px;padding:0 2px}
+  .mesTot{display:flex;justify-content:space-between;font-size:12px;color:var(--creme-dim);padding-top:8px;font-family:'DM Mono',monospace}
+  .acum{font-size:11px;color:var(--dourado-cl);opacity:.8;text-align:right;margin-top:4px;font-family:'DM Mono',monospace}
+
+  .addrow{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+  .btn{font-family:'Barlow';font-weight:600;border:none;border-radius:10px;cursor:pointer;font-size:13px;padding:9px 12px;transition:.15s;white-space:nowrap}
+  .btn.gold{background:var(--dourado);color:var(--verde)}
+  .btn.ghost{background:transparent;border:1px solid var(--linha);color:var(--creme-dim)}
+  .btn.credito{background:rgba(159,207,122,.14);border:1px solid rgba(159,207,122,.45);color:var(--credito)}
+  .btn.debito{background:rgba(224,162,58,.13);border:1px solid rgba(224,162,58,.45);color:var(--debito)}
+  .btn.mini{font-size:12px;padding:7px 11px;border-radius:9px}
+  .btn.full{width:100%}
+
+  .vazio{text-align:center;padding:30px 18px;color:var(--creme-dim)}
+  .vazio p{font-size:13px;line-height:1.5;margin-top:6px}
+
+  .fab{position:fixed;right:18px;bottom:20px;z-index:40;background:var(--dourado);color:var(--verde);border:none;padding:0 20px;height:54px;border-radius:28px;font-weight:700;font-size:15px;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;gap:8px}
+  .fab span{font-size:22px;line-height:1}
+
+  .ov{position:fixed;inset:0;background:rgba(20,28,10,.66);z-index:50;display:none;align-items:flex-end;justify-content:center}
+  .ov.on{display:flex}
+  .modal{background:var(--verde-esc);width:100%;max-width:520px;border-radius:20px 20px 0 0;border-top:2px solid var(--dourado);padding:18px 16px 26px;max-height:92vh;overflow-y:auto}
+  @media(min-width:560px){.ov{align-items:center}.modal{border-radius:20px;border:1px solid var(--dourado)}}
+  .modal h2{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;margin-bottom:14px}
+  .seg{display:flex;gap:6px;margin-bottom:16px;background:var(--verde);border:1px solid var(--linha);border-radius:11px;padding:4px}
+  .seg button{flex:1;border:none;background:transparent;color:var(--creme-dim);font-family:'Barlow';font-weight:600;font-size:12.5px;padding:9px 4px;border-radius:8px;cursor:pointer}
+  .seg button.on{background:var(--dourado);color:var(--verde)}
+  .fld{margin-bottom:13px}
+  .fld label{display:block;font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--creme-dim);font-weight:600;margin-bottom:5px}
+  .fld input{width:100%;background:var(--verde);border:1px solid var(--linha);border-radius:10px;color:var(--creme);font-family:'Barlow';font-size:15px;padding:11px 12px}
+  .fld input:focus{outline:none;border-color:var(--dourado)}
+  .fld .row{display:flex;gap:10px}.fld .row>div{flex:1}
+  .hintline{font-size:11.5px;color:var(--creme-dim);margin-top:5px}
+  .modal-acts{display:flex;gap:10px;margin-top:8px}.modal-acts .btn{flex:1;padding:12px}
+  .btn:focus-visible,.fab:focus-visible,.seg button:focus-visible{outline:2px solid var(--dourado-cl);outline-offset:2px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="marca">Loretto Scarpa</div>
+  <h1>Central de <span class="lion">Modelos</span></h1>
+  <div class="sub" id="sub">Fechamento mensal · sapatos e dinheiro dos modelos de produção</div>
+  <div id="modotag"></div>
+</header>
+
+<div id="aviso" class="aviso" style="display:none"></div>
+
+<section class="resumo" id="resumo">
+  <div class="kpi full"><div class="lab">Total a pagar em dinheiro</div><div class="val" id="kpiValor">R$ 0,00</div></div>
+  <div class="kpi"><div class="lab">Sapatos a entregar</div><div class="val" id="kpiPares">0 <small>pares</small></div></div>
+  <div class="kpi"><div class="lab">Modelos</div><div class="val" id="kpiModelos">0</div></div>
+</section>
+
+<div class="baradmin" id="barAdmin"><button class="btn ghost full" onclick="novoModelo()">+ Novo modelo</button></div>
+
+<div class="wrap" id="view"></div>
+
+<button class="fab" id="fab" onclick="abrirNovo()"><span>+</span> Lançar</button>
+
+<!-- MODAL -->
+<div class="ov" id="ov">
+  <div class="modal">
+    <h2 id="modalTitulo">Novo lançamento</h2>
+    <div class="seg" id="seg">
+      <button data-tipo="producao" class="on" onclick="setTipo('producao')">+ Gravação</button>
+      <button data-tipo="retirada" onclick="setTipo('retirada')">− Pegou 👞</button>
+    </div>
+    <div class="fld">
+      <label>Modelo</label>
+      <input id="fModelo" list="modelosList" placeholder="Nome do modelo" autocomplete="off"/>
+      <datalist id="modelosList"></datalist>
+    </div>
+    <div class="fld">
+      <label>Data</label>
+      <input id="fData" type="date"/>
+    </div>
+    <div class="fld" id="fldTitulo">
+      <label>Título / observação (opcional)</label>
+      <input id="fTitulo" placeholder="Ex: Reels bota social"/>
+    </div>
+    <div class="fld">
+      <div class="row">
+        <div><label id="lblSapatos">Sapatos</label><input id="fSapatos" type="number" min="0" step="1" inputmode="numeric"/></div>
+        <div id="boxDinheiro"><label>Valor (R$)</label><input id="fDinheiro" type="number" min="0" step="0.01" inputmode="decimal"/></div>
+      </div>
+      <div class="hintline" id="hintComb">Padrão do combinado: 2 sapatos + R$200 por gravação.</div>
+    </div>
+    <div class="modal-acts">
+      <button class="btn ghost" onclick="fecharModal()">Cancelar</button>
+      <button class="btn gold" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Central de Modelos — fechamento mensal + acompanhamento
+   MODOS:
+     • Admin (Larissa): sem ?t= na URL. Edita tudo, vê todos.
+     • Acompanhamento (modelo): URL ?t=TOKEN. Só leitura, só o
+       modelo daquele token, não vê os outros nem edita.
+   Movimentos:
+     producao → +sapatos +dinheiro (gravação)
+     retirada → −sapatos (modelo pegou o sapato = baixa)
+   Dinheiro é por MÊS: a Larissa marca "Pago ✓" no mês.
+     A pagar = soma do dinheiro das gravações de meses não pagos.
+   Saldo de sapatos = Σ produção.sapatos − Σ retirada.sapatos (acumula).
+   Armazenamento: localStorage (blindado). Firebase opcional no fim.
+   ============================================================ */
+const KEY='loretto_modelos_v7';
+let mov=[], seq=0, roster=[], pagos={}, storageOK=true;
+// roster: [{nome, token}]   pagos: { "Modelo|YYYY-MM": true }
+
+const params=new URLSearchParams(location.search);
+const TOKEN=params.get('t');           // se presente → modo acompanhamento
+let MODELO_VIEW=null;                   // nome do modelo no modo leitura
+const isAdmin=()=>!TOKEN;
+
+function carregar(){
+  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);mov=o?.mov||[];seq=o?.seq||0;roster=o?.roster||[];pagos=o?.pagos||{};}}
+  catch(e){storageOK=false;}
+}
+function persistir(){
+  try{localStorage.setItem(KEY,JSON.stringify({mov,seq,roster,pagos}));}catch(e){storageOK=false;}
+  if(window.__fbSync)window.__fbSync({mov,roster,pagos});
+  render();
+}
+
+/* ---------- helpers ---------- */
+const brl=v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const tok=()=>Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const mesKey=iso=>iso?iso.slice(0,7):'0000-00';
+function mesNome(k){const [a,m]=k.split('-');return m==='00'?'Sem data':`${MES[+m-1]} ${a}`;}
+function dataExt(iso){if(!iso)return'';const[a,m,d]=iso.split('-');return `${+d}/${m}`;}
+function tokenDe(nome){const r=roster.find(x=>x.nome===nome);return r?r.token:'';}
+function addModelo(nome){nome=(nome||'').trim();if(!nome)return;if(!roster.some(x=>x.nome.toLowerCase()===nome.toLowerCase()))roster.push({nome,token:tok()});}
+
+/* ---------- saldos ---------- */
+function movDe(nome){return mov.filter(m=>m.modelo===nome);}
+function saldoSapatos(nome){let s=0;movDe(nome).forEach(m=>{s+=(m.tipo==='producao'?(+m.sapatos||0):-(+m.sapatos||0));});return s;}
+function aPagar(nome){let v=0;movDe(nome).forEach(m=>{if(m.tipo==='producao'&&!pagos[nome+'|'+mesKey(m.data)])v+=(+m.dinheiro||0);});return v;}
+
+/* ---------- render ---------- */
+const abertos=new Set();
+function render(){
+  const admin=isAdmin();
+  document.body.classList.toggle('leitura',!admin);
+  fab.style.display=admin?'flex':'none';
+  barAdmin.style.display=admin?'block':'none';
+  resumo.style.display=admin?'grid':'none';
+  modotag.innerHTML=admin?'':'<span class="modotag">Acompanhamento · somente leitura</span>';
+  sub.textContent=admin?'Fechamento mensal · sapatos e dinheiro dos modelos de produção':'Seu histórico de gravações, sapatos e pagamentos com a Loretto Scarpa';
+
+  // datalist
+  modelosList.innerHTML=roster.map(r=>`<option value="${esc(r.nome)}">`).join('');
+
+  if(!admin){
+    const r=roster.find(x=>x.token===TOKEN);
+    MODELO_VIEW=r?r.nome:null;
+    if(!MODELO_VIEW){view.innerHTML=`<div class="vazio"><h3>Link inválido</h3><p>Peça um novo link de acompanhamento para a Larissa.</p></div>`;return;}
+    abertos.add(MODELO_VIEW);
+    view.innerHTML=cardModelo(MODELO_VIEW,false);
+    return;
+  }
+
+  // admin KPIs
+  let totDin=0,totSap=0;
+  roster.forEach(r=>{totDin+=aPagar(r.nome);const s=saldoSapatos(r.nome);if(s>0)totSap+=s;});
+  kpiValor.textContent=brl(totDin);
+  kpiPares.innerHTML=totSap+' <small>pares</small>';
+  kpiModelos.textContent=roster.length;
+
+  const nomes=[...roster.map(r=>r.nome)].sort((a,b)=>a.localeCompare(b));
+  if(!nomes.length){view.innerHTML=`<div class="vazio" style="padding:48px 24px"><div style="font-size:34px;opacity:.4">👞</div><h3 style="font-family:'Playfair Display',serif;margin-top:10px">Nenhum modelo</h3><p>Cadastre um modelo e comece a lançar as gravações.</p></div>`;return;}
+  view.innerHTML=nomes.map(n=>cardModelo(n,true)).join('');
+}
+
+function cardModelo(nome,admin){
+  const isOpen=abertos.has(nome);
+  const sSap=saldoSapatos(nome), sDin=aPagar(nome);
+  // agrupa por mês
+  const byM={};
+  movDe(nome).forEach(m=>{const k=mesKey(m.data);(byM[k]=byM[k]||[]).push(m);});
+  const chavesAsc=Object.keys(byM).sort();           // p/ acumulado
+  let acSap=0; const acumAteMes={};
+  chavesAsc.forEach(k=>{byM[k].forEach(m=>{acSap+=(m.tipo==='producao'?(+m.sapatos||0):-(+m.sapatos||0));});acumAteMes[k]=acSap;});
+  const chaves=[...chavesAsc].reverse();             // exibe recente primeiro
+
+  const mesesHTML=chaves.map(k=>{
+    const items=[...byM[k]].sort((a,b)=>(b.data||'').localeCompare(a.data||'')||(b.ordem||0)-(a.ordem||0));
+    let gSap=0,gRet=0,gDin=0;
+    const linhas=items.map(m=>{
+      if(m.tipo==='producao'){gSap+=(+m.sapatos||0);gDin+=(+m.dinheiro||0);
+        return `<div class="lin prod"><div class="ic">🎬</div>
+          <div class="d"><div class="dt">${dataExt(m.data)} ${esc(m.titulo||'Gravação')}</div><div class="sm">gravação</div></div>
+          <div class="amt"><span class="sp">+${m.sapatos} 👞</span>${+m.dinheiro?`<br><span class="mn">+${brl(m.dinheiro)}</span>`:''}</div>
+          ${admin?`<div class="x" onclick="excluir('${m.id}')">×</div>`:''}</div>`;}
+      else{gRet+=(+m.sapatos||0);
+        return `<div class="lin ret"><div class="ic">👞</div>
+          <div class="d"><div class="dt">${dataExt(m.data)} ${esc(m.titulo||'Pegou sapato')}</div><div class="sm">retirada</div></div>
+          <div class="amt"><span class="sp neg">−${m.sapatos} 👞</span></div>
+          ${admin?`<div class="x" onclick="excluir('${m.id}')">×</div>`:''}</div>`;}
+    }).join('');
+    const pago=!!pagos[nome+'|'+k];
+    const temDin=gDin>0;
+    const badge=!temDin?'':`<span class="badge ${pago?'pago':'apagar'} ${admin?'clic':''}" ${admin?`onclick="togglePago('${esc(nome)}','${k}')"`:''}>${pago?'Pago ✓':'A pagar'}</span>`;
+    return `<div class="mes">
+      <div class="mesH"><span class="mt">${mesNome(k)}</span>${badge}</div>
+      <div class="mesB">
+        ${linhas}
+        <div class="mesTot"><span>${gSap?('+'+gSap+' 👞'):''}${gRet?('  −'+gRet+' 👞'):''}</span><span>${gDin?brl(gDin):''}</span></div>
+        <div class="acum">saldo acumulado: ${acumAteMes[k]} 👞</div>
+      </div>
+    </div>`;
+  }).join('') || `<div class="vazio"><p>Sem gravações ainda.</p></div>`;
+
+  const linkBtn=admin?`<button class="btn ghost mini" onclick="copiarLink('${esc(nome)}')">🔗 Link de acompanhamento</button>`:'';
+  const addBtns=admin?`<div class="addrow">
+      <button class="btn credito mini" onclick="abrirNovo('${esc(nome)}','producao')">+ Gravação</button>
+      <button class="btn debito mini" onclick="abrirNovo('${esc(nome)}','retirada')">− Pegou 👞</button>
+      ${linkBtn}
+      ${movDe(nome).length===0?`<button class="btn ghost mini" style="color:var(--vermelho)" onclick="removerModelo('${esc(nome)}')">Remover</button>`:''}
+    </div>`:'';
+
+  const editIco=admin?`<span class="edit" onclick="event.stopPropagation();renomearModelo('${esc(nome)}')">✎</span>`:'';
+
+  return `<div class="modelo ${isOpen?'open':''}">
+    <div class="mhead" onclick="toggle('${esc(nome)}')">
+      <h3><span>${esc(nome)}</span><span class="acts">${editIco}<span class="chev">▾</span></span></h3>
+    </div>
+    <div class="saldos">
+      <div class="saldo"><div class="t">Sapatos a pegar</div><div class="n ${sSap<=0?'zero':''}">${sSap}</div><div class="leg">${sSap>0?'acumulados':'em dia'}</div></div>
+      <div class="saldo"><div class="t">A pagar em R$</div><div class="n ${sDin<=0?'zero':''}" style="font-size:${sDin>=10000?'17px':'22px'}">${brl(sDin)}</div><div class="leg">${sDin>0?'em aberto':'tudo pago'}</div></div>
+    </div>
+    <div class="corpo">
+      <div class="secaoT">Fechamento mensal</div>
+      ${mesesHTML}
+      ${addBtns}
+    </div>
+  </div>`;
+}
+function toggle(nome){if(abertos.has(nome))abertos.delete(nome);else abertos.add(nome);render();}
+
+/* ---------- ações admin ---------- */
+function togglePago(nome,k){if(!isAdmin())return;const key=nome+'|'+k;if(pagos[key])delete pagos[key];else pagos[key]=true;persistir();}
+
+let tipoAtual='producao';
+function setTipo(t){
+  tipoAtual=t;
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.tipo===t));
+  boxDinheiro.style.display=t==='producao'?'block':'none';
+  hintComb.style.display=t==='producao'?'block':'none';
+  lblSapatos.textContent=t==='retirada'?'Sapatos que pegou':'Sapatos';
+  fldTitulo.querySelector('label').textContent=t==='retirada'?'O que pegou (opcional)':'Título / observação (opcional)';
+  fTitulo.placeholder=t==='retirada'?'Ex: Loafer camurça preto':'Ex: Reels bota social';
+}
+function abrirNovo(modelo,tipo){
+  if(!isAdmin())return;
+  fModelo.value=(modelo&&typeof modelo==='string')?modelo:'';
+  fData.value=new Date().toISOString().slice(0,10);
+  fTitulo.value='';
+  setTipo((tipo&&typeof tipo==='string')?tipo:'producao');
+  fSapatos.value=tipoAtual==='producao'?2:'';
+  fDinheiro.value=tipoAtual==='producao'?200:'';
+  modalTitulo.textContent='Novo lançamento';
+  ov.classList.add('on');
+  if(!fModelo.value)fModelo.focus();
+}
+function fecharModal(){ov.classList.remove('on');fModelo.style.borderColor='';}
+function salvar(){
+  const modelo=fModelo.value.trim();
+  if(!modelo){fModelo.style.borderColor='var(--vermelho)';fModelo.focus();return;}
+  const sap=parseInt(fSapatos.value)||0, din=parseFloat(fDinheiro.value)||0;
+  if(tipoAtual==='producao'&&sap===0&&din===0){alert('Informe os sapatos e/ou o valor da gravação.');return;}
+  if(tipoAtual==='retirada'&&sap===0){alert('Informe quantos sapatos o modelo pegou.');return;}
+  seq++;
+  mov.push({id:uid(),ordem:seq,modelo,tipo:tipoAtual,data:fData.value||'',titulo:fTitulo.value.trim(),
+            sapatos:sap,dinheiro:tipoAtual==='producao'?din:0});
+  addModelo(modelo);abertos.add(modelo);
+  fecharModal();persistir();
+}
+function excluir(id){
+  if(!isAdmin())return;
+  const m=mov.find(x=>x.id===id);if(!m)return;
+  if(!confirm(`Excluir este lançamento de ${m.modelo}?`))return;
+  mov=mov.filter(x=>x.id!==id);persistir();
+}
+function novoModelo(){const n=prompt('Nome do novo modelo:');if(n&&n.trim()){addModelo(n.trim());abertos.add(n.trim());persistir();}}
+function renomearModelo(antigo){
+  const novo=prompt('Editar nome do modelo:',antigo);if(novo===null)return;const n=novo.trim();if(!n)return;
+  roster.forEach(r=>{if(r.nome===antigo)r.nome=n;});
+  mov.forEach(m=>{if(m.modelo===antigo)m.modelo=n;});
+  Object.keys(pagos).forEach(k=>{if(k.startsWith(antigo+'|')){pagos[n+'|'+k.split('|')[1]]=pagos[k];delete pagos[k];}});
+  if(abertos.has(antigo)){abertos.delete(antigo);abertos.add(n);}
+  persistir();
+}
+function removerModelo(nome){
+  if(movDe(nome).length){alert('Esse modelo tem lançamentos. Apague-os antes de remover.');return;}
+  if(!confirm(`Remover ${nome}?`))return;
+  roster=roster.filter(r=>r.nome!==nome);persistir();
+}
+function copiarLink(nome){
+  const t=tokenDe(nome);
+  const url=`${location.origin}${location.pathname}?t=${t}`;
+  const ok=()=>alert(`Link de acompanhamento do ${nome} copiado:\n\n${url}\n\nEle abre só o histórico dele, sem edição.`);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(ok,()=>prompt('Copie o link:',url));}
+  else prompt('Copie o link:',url);
+}
+ov.addEventListener('click',e=>{if(e.target===ov)fecharModal();});
+
+/* ---------- seed (1ª vez) ---------- */
+function seed(){
+  if(mov.length||roster.length)return;
+  ['Marcos','Rodolfo','Mateus','Eliseu'].forEach(addModelo);
+  const add=(modelo,tipo,data,titulo,sapatos,dinheiro)=>{seq++;mov.push({id:uid(),ordem:seq,modelo,tipo,data,titulo,sapatos:sapatos||0,dinheiro:dinheiro||0});};
+  // Marcos — algumas gravações de exemplo (datas reais aproximadas da planilha)
+  add('Marcos','producao','2026-01-17','Fotos',2,200);
+  add('Marcos','producao','2026-02-29','Vídeo conteúdo',2,200);
+  add('Marcos','producao','2026-05-30','Fotos',2,200);
+  add('Marcos','retirada','2026-05-30','Sneaker branco',1,0);
+  add('Marcos','retirada','2026-03-20','Eliseu e Marcio',3,0);
+  // Rodolfo
+  add('Rodolfo','producao','2026-05-14','Fotos',2,0);
+  add('Rodolfo','producao','2026-02-25','Fotos',2,0);
+}
+
+/* ---------- boot ---------- */
+carregar();
+seed();
+persistir();
+if(!storageOK){
+  aviso.style.display='block';
+  aviso.innerHTML='⚠️ Este navegador não está salvando os dados (armazenamento bloqueado). Os dados aparecem, mas <b>não persistem ao fechar</b>. Hospede no GitHub Pages ou conecte o Firebase pra salvar de verdade.';
+}
+</script>
+
+<!-- ============================================================
+     FIREBASE (opcional, recomendado p/ os links de acompanhamento)
+     Com Firebase, cada link puxa só os dados do modelo → privacidade real.
+     Descomente, cole o config do projeto loretto-scarpa-l-icr,
+     mantenha o doc único "geral" (mov, roster, pagos).
+============================================================ -->
+<!--
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig = { /* COLE AQUI */ };
+const db = getFirestore(initializeApp(firebaseConfig));
+const ref = doc(db,'modelos','geral');
+onSnapshot(ref, snap=>{ const o=snap.data()||{}; mov=o.mov||[]; roster=o.roster||[]; pagos=o.pagos||{}; render(); });
+window.__fbSync = (o)=> setDoc(ref, o);
+</script>
+-->
+
+</body>
+</html>
